@@ -42,12 +42,10 @@ with con:
     ]
   cur.executemany("INSERT INTO weather VALUES (?,?,?,?,?)", weather)
   cur.execute("SELECT name, state FROM cities INNER JOIN weather ON name = city GROUP BY warm_month = 'July'")
-  rows = cur.fetchall()
+   rows = cur.fetchall()
   df = pd.DataFrame(rows)
   name = df[0]
   state = df[1]
-  for row in rows:
-      warmest = {0}, {1}.format(name, state)
   print "The cities that are warmest in July are:"
-      
- 
+  for row in rows:
+      print (row[0] + ", " + row[1])
