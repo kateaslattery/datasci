@@ -41,32 +41,20 @@ df2["Variance"] = [df['Alcohol'].var(), df['Tobacco'].var()]
 
 df2["StdVar"] = [df['Alcohol'].std(), df['Tobacco'].std()]
 
-print "The mean for the Alcohol dataset is: " 
-print df2.iloc[0,0]
-print " and the mean for the Tobacco dataset is: " 
-print df2.iloc[1,0]  
+print "The mean for the Alcohol dataset is " + str(df2.iloc[0,0]) + \
+    " and the mean for the Tobacco dataset is " + str(df2.iloc[1,0]) + "."
 
-print "The median for the Alcohol dataset is: " 
-print df2.iloc[0,1]
-print " and the median for the Tobacco dataset is: " 
-print df2.iloc[1,1]  
+print "The median for the Alcohol dataset is " + str(df2.iloc[0,1]) + \
+    " and the median for the Tobacco dataset is " + str(df2.iloc[1,1]) + "."  
 
-print "The mode for the Alcohol dataset is: " 
-print df2.iloc[0,2]
-print " and the mode for the Tobacco dataset is: " 
-print df2.iloc[1,2]  
+print "The mode for the Alcohol dataset is " + str(df2.iloc[0,2]) + \
+     " and the mode for the Tobacco dataset is " + str(df2.iloc[1,2]) + "." 
 
-print "The range for the Alcohol dataset is: " 
-print df2.iloc[0,3]
-print " and the range for the Tobacco dataset is: " 
-print df2.iloc[1,3]  
+print "The range for the Alcohol dataset is " + str(df2.iloc[0,3]) + \
+    " and the range for the Tobacco dataset is " + str(df2.iloc[1,3]) + "."  
 
-print "The variance for the Alcohol dataset is: " 
-print df2.iloc[0,4]
-print " and the variance for the Tobacco dataset is: " 
-print df2.iloc[1,4]  
+print "The variance for the Alcohol dataset is " + str(df2.iloc[0,4]) + \
+    " and the variance for the Tobacco dataset is " + str(df2.iloc[1,4]) + "." 
 
-print "The standard variation for the Alcohol dataset is: " 
-print df2.iloc[0,5]
-print " and the standard variation for the Tobacco dataset is: " 
-print df2.iloc[1,5]  
+print "The standard variation for the Alcohol dataset is " + str(df2.iloc[0,5]) + \
+    " and the standard variation for the Tobacco dataset is " + str(df2.iloc[1,5]) + "." 
