@@ -1,68 +1,59 @@
-# coding: utf-8
-
 # Linear Regression
-# 
-# 
 # A lesson in modelling linear relationships to describe the correlation of two variables to each other.
-# 
+                          
+import matplotlib.pyplot as plt                      #(simple data visualizations- histograms, scatter plots, box plot)
+import pandas as pd                                  #(structures data into data frames)
+import statsmodels.api as sm                         #(read from csv, analyze dataframes)   
+import numpy as np                                   #(stats visualizations)
+import math                                          #(computing package- matrix multiplication)
+from sklearn.linear_model import LogisticRegression
 
-# 1. Load Libraries
-
-#get_ipython().magic(u'matplotlib inline')
-                                   # (simple data visualizations- histograms, scatter plots, box plot)
-import matplotlib.pyplot as plt    # (structures data into data frames)
-import pandas as pd                # (read from csv, analyze dataframes)
-import statsmodels.api as sm       # (stats visualizations)
-import numpy as np                 # (computing package- matrix multiplication)
-
-
-# 2. Explore Data
+# Import Data
 
 loansData = pd.read_csv('https://spark-public.s3.amazonaws.com/dataanalysis/loansData.csv')
 loansData.dtypes
 
-loansData['Interest.Rate'][0:5]
+# -----------
+# Clean Data 
+# -----------
+
+# Strip %
+StripSign = lambda element: round(float(element.rstrip('%'))/100, 4)
+
+# Strip Unit
+StripUnit = lambda element: int(element.rstrip(' months'))
+
+# Convert to string, Split on '-'
+SplitFico = lambda element: str(element).split('-')
+
+# Convert pairs of FICO scores to int, pick min
+ConvFico = lambda element: min([int(num) for num in element])
 
 
-loansData['Loan.Length'][0:5]
+# Strip % from Interest Rate Column
+loansData['Interest.Rate'] = map(StripSign, loansData['Interest.Rate'])
 
+# Strip Month from loan length Column
 
-loansData['FICO.Range'][0:5]
+loansData['Loan.Length'] = map(StripUnit, loansData['Loan.Length'])
 
+# Split FICO scores on '-' and choose min of each pair
+loansData['FICO.Score'] = map(SplitFico, loansData['FICO.Range'])
+loansData['FICO.Score'] = map(ConvFico, loansData['FICO.Score'])
 
-# 3. Clean Data
-#    To convert data into a raw, homogenous format the units must be removed. Specifically, the "%" on the Interest Rates, the "months" on the Loan Lenghts and the range for the FICO ranges.
-#    Lambda functions will be used to avoid binding the function to a name. 
+#print loansData['Interest.Rate'][0:5]
+#print loansData['Loan.Length'][0:5]
+#print loansData['FICO.Score'][0:5]
 
-loansData['Interest.Rate'] = map(lambda x: x.rstrip("%"),(loansData["Interest.Rate"]))
-loansData['Interest.Rate'][0:5]
-
-
-loansData['Loan.Length'] = map(lambda x: x.rstrip(" months"), loansData['Loan.Length'])
-loansData['Loan.Length'][0:5]
-
-
-#cleanFicoRange = map(lambda x: x.split('-'), loansData['FICO.Range'])
-#loansData['FICO.Score'] = cleanFicoRange
-#loansData['FICO.Range'] = loansData['FICO.Score'] #how to select just first column?
-#loansData['FICO.Range'][0:5]
-
-loansData['FICO.Score'] = [float(val.split('-')[0]) for val in loansData['FICO.Range']]
-loansData['FICO.Score'][0:5]
-
-
-# 3. Plot the data
-
+loansData.to_csv('loansData_clean.csv', header=True, index=False)
 
 plt.figure()
 p = loansData['FICO.Score'].hist()
 plt.show()
 
-
 a = pd.scatter_matrix(loansData, alpha=0.05, figsize=(10,10), diagonal='hist')
 
-
-# 4. Define a linear model
+# Define a linear model
 
 intrate = loansData['Interest.Rate']
 loanamt = loansData['Amount.Requested']
@@ -79,9 +70,11 @@ X = sm.add_constant(x)
 model = sm.OLS(y,X)
 f = model.fit()
 # Output the results
-f.summary()
+print 'Coefficients: ', f.params[0:2]
+print 'Intercept: ', f.params[2]
+print 'P-Values: ', f.pvalues
+print 'R-Squared: ', f.rsquared
 
-
-# - p-value should be 0.05 or less
+# -P-Value should be 0.05 or less
 # - R is a "coefficient of correlation" between the independent variables and the dependent variable
 # - A high R2 would be close to 1.0, and a low one close to 0
