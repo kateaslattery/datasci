@@ -30,14 +30,14 @@ cities = { "LA": '34.019394,-118.410825',
 
         }
         
-end_date = datetime.datetime.now() # by setting this equal to a variable, we fix the calculation to the point when we started the scrip (rather than have things move aroudn while we're coding.)
+end_date = datetime.datetime.now() 
 
 
 api_key = '542da3a6578eb734d6985bbd9c6f6e9c'
 url = 'https://api.forecast.io/forecast/' + api_key + '/'
 
 # ---------------
-# API Information
+# API Connection
 # ---------------
 
 # Establish database connection
@@ -47,15 +47,17 @@ cur = con.cursor()
 cities.keys()
 with con:
     cur.execute('DROP TABLE IF EXISTS daily_temp')
-    cur.execute('CREATE TABLE daily_temp ( day_of_reading INT, LA REAL, Miami REAL, NewOrleans REAL, NYC REAL, DC REAL);') #use your own city names instead of city1...
+    cur.execute('CREATE TABLE daily_temp ( day_of_reading INT, LA REAL, Miami REAL, NewOrleans REAL, NYC REAL, DC REAL);') #New database table: daily_temp
 
 query_date = end_date - datetime.timedelta(days=30) #the current value being processed
 
+#create date column in daily_temp
 with con:
     while query_date < end_date:
         cur.execute("INSERT INTO daily_temp(day_of_reading) VALUES (?)", (int(query_date.strftime('%s')),))
         query_date += datetime.timedelta(days=1)
-    
+
+#add daily temperature max column to daily_temp table for the previous 30 days
 for k,v in cities.iteritems():
     query_date = end_date - datetime.timedelta(days=30) #set value each time through the loop of cities
     while query_date < end_date:
@@ -69,17 +71,16 @@ for k,v in cities.iteritems():
         #increment query_date to the next day for next operation of loop
         query_date += datetime.timedelta(days=1) #increment query_date to the next day
 
-# read the weather data into a dataframe
+# transfer the weather data from daily_temp into a dataframe
 df = pd.read_sql_query("SELECT * FROM daily_temp ORDER BY day_of_reading", con)
 
-# convert the dates to datetime objects and set this column
-# as the index
+# convert the dates to datetime objects for indexing
 pd.to_datetime(df['day_of_reading'], unit='s')
 df.set_index('day_of_reading', drop=True, inplace=True)
 
 
 # --------------------
-# Greatest Temp Change
+# Analysis: Greatest Temp Change
 # --------------------
 
 # Total temp change per city
@@ -104,7 +105,7 @@ print "with an aggregate change in temperature of: " + str(tot_change[max_temp_r
 
 
 # -------------------
-# Greatest temp swing
+# Analysis: Greatest temp swing
 # -------------------
 
 swing = collections.defaultdict(int)
@@ -124,3 +125,5 @@ max_swing = max(swing, key=swing.get)
 
 print "The city with the largest day-to-day temperature swing was: " + max_swing
 print "with an day-to-day swing of: " + str(swing[max_swing]) + " degrees."
+
+con.close() # a good practice to close connection to database
